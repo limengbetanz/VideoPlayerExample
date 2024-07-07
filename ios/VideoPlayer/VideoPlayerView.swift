@@ -10,8 +10,8 @@ import AVKit
 
 class VideoPlayerView: UIView {
     private var player: AVPlayer?
-    private var loaded: Bool = false
-
+    private var urlString: String?
+    
     func play(_ urlString: String) {
         loadVideo(urlString)
         player?.play()
@@ -22,17 +22,18 @@ class VideoPlayerView: UIView {
     }
     
     private func loadVideo(_ urlString: String) {
-        guard loaded == false,
+        guard self.urlString != urlString,
               let url = URL(string: urlString) else {
             return
         }
+        
+        self.urlString = urlString
+        player = nil
         
         player = AVPlayer(url: url)
         let playerLayer = AVPlayerLayer(player: player)
         playerLayer.frame = bounds
         layer.addSublayer(playerLayer)
-        
-        loaded = true
     }
 }
 
