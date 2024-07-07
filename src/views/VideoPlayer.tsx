@@ -1,14 +1,8 @@
-//
-//  VideoPlayer.tsx
-//  VideoPlayerExample
-//
-//  Created by Terry Li on 06/07/2024.
-//
-
 import React, {useRef, useEffect, useState} from 'react';
 import {
+  NativeModules,
+  NativeEventEmitter,
   requireNativeComponent,
-  UIManager,
   findNodeHandle,
   Button,
   TextInput,
@@ -21,22 +15,25 @@ import {
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Orientation from 'react-native-orientation-locker';
-import model from '../models/VideoPlayerModel';
-import type {VideoItem} from './models/VideoPlayerModel';
+import model, {VideoItem} from '../models/VideoPlayerModel';
 import UrlValidator from '../utils/UrlValidator';
 
+type Props = {};
+
+const {VideoPlayerManager, VideoPlayerEventEmitter} = NativeModules;
 const VideoPlayer = requireNativeComponent('VideoPlayer');
 
-const VideoPlayerComponent = () => {
-  const [orientation, setOrientation] = useState('PORTRAIT');
-  const videoRef = useRef(null);
-  const [url, setUrl] = React.useState('');
+const VideoPlayerComponent: React.FC<Props> = () => {
+  const [orientation, setOrientation] = useState<string>('PORTRAIT');
+  const videoRef = useRef<any>(null);
+  const [url, setUrl] = useState<string>('');
+  const [readyToPlay, setReadyToPlay] = useState<boolean>(false);
 
   useEffect(() => {
     const initialOrientation = Orientation.getInitialOrientation();
     setOrientation(initialOrientation);
 
-    const orientationChangeListener = newOrientation => {
+    const orientationChangeListener = (newOrientation: string) => {
       setOrientation(newOrientation);
     };
 
@@ -47,37 +44,51 @@ const VideoPlayerComponent = () => {
     };
   }, []);
 
-  const showAlert = message => {
-    Alert.alert('Error', message, [{text: 'Got it', onPress: () => {}}], {
-      cancelable: true,
-    });
-  };
+  useEffect(() => {
+    const eventEmitter = new NativeEventEmitter(VideoPlayerEventEmitter);
+    const subscription = eventEmitter.addListener(
+      'onVideoPlayerError',
+      error => {
+        Alert.alert('Error', `${error.code}: ${error.message}`);
+      },
+    );
 
-  const playVideo = () => {
-    if (!UrlValidator.isValidUrl(url)) {
-      showAlert('Invalid url format!');
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const loadVideo = () => {
+    if (!validateUrl(url)) {
       return;
     }
 
-    UIManager.dispatchViewManagerCommand(
-      findNodeHandle(videoRef.current),
-      UIManager.getViewManagerConfig('VideoPlayer').Commands.play,
-      [url],
-    );
+    const node = findNodeHandle(videoRef.current);
+    VideoPlayerManager.load(node, url)
+      .then(() => {
+        setReadyToPlay(true);
+      })
+      .catch((error: any) => {
+        Alert.alert('Error', `${error.code}: ${error.message}`);
+      });
+  };
+
+  const playVideo = () => {
+    const node = findNodeHandle(videoRef.current);
+    VideoPlayerManager.play(node);
   };
 
   const pauseVideo = () => {
-    UIManager.dispatchViewManagerCommand(
-      findNodeHandle(videoRef.current),
-      UIManager.getViewManagerConfig('VideoPlayer').Commands.pause,
-      [],
-    );
+    const node = findNodeHandle(videoRef.current);
+    VideoPlayerManager.pause(node);
   };
 
-  const validateUrl = (value: string) => {
-    if (!UrlValidator.isValidUrl(value)) {
-      showAlert('Invalid URL!');
+  const validateUrl = (value: string): Boolean => {
+    let invalid = UrlValidator.isValidUrl(value);
+    if (!invalid) {
+      Alert.alert('Error', 'Invalid URL!');
     }
+    return invalid;
   };
 
   const isLandscape = orientation !== 'PORTRAIT';
@@ -87,17 +98,20 @@ const VideoPlayerComponent = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <View style={styles.pickerContainer}>
-          <Text style={styles.label}>Select a predefined video:</Text>
+          <Text style={styles.label}>Select a test video:</Text>
           <RNPickerSelect
             placeholder={{
               label: 'Select a video...',
               value: null,
             }}
-            items={model.videoItems.map(item => ({
+            items={model.videoItems.map((item: VideoItem) => ({
               label: item.title,
               value: item.url,
             }))}
-            onValueChange={setUrl}
+            onValueChange={value => {
+              setUrl(value);
+              setReadyToPlay(false);
+            }}
             style={{
               inputAndroid: styles.picker,
               inputIOS: styles.picker,
@@ -112,8 +126,14 @@ const VideoPlayerComponent = () => {
             style={styles.input}
             placeholder="Enter video URL"
             value={url}
-            onChangeText={setUrl}
-            onSubmitEditing={() => validateUrl(url)}
+            onChangeText={input => {
+              setUrl(input);
+              setReadyToPlay(false);
+            }}
+            onSubmitEditing={() => {
+              validateUrl(url);
+              setReadyToPlay(false);
+            }}
           />
         </View>
 
@@ -127,8 +147,13 @@ const VideoPlayerComponent = () => {
           ]}
         />
         <View style={styles.controls}>
-          <Button title="Play" onPress={playVideo} />
-          <Button title="Pause" onPress={pauseVideo} />
+          <Button
+            title="Load"
+            disabled={readyToPlay || url.length === 0}
+            onPress={loadVideo}
+          />
+          <Button title="Play" disabled={!readyToPlay} onPress={playVideo} />
+          <Button title="Pause" disabled={!readyToPlay} onPress={pauseVideo} />
         </View>
       </View>
     </ScrollView>

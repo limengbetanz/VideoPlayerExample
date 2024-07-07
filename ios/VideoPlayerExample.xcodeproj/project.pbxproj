@@ -18,6 +18,8 @@
 		9765E2CA2C3911500013D315 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9765E2C92C3911500013D315 /* VideoPlayerView.swift */; };
 		9765E2CC2C39123D0013D315 /* VideoPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9765E2CB2C39123D0013D315 /* VideoPlayerManager.m */; };
 		9765E2CE2C3947200013D315 /* VideoPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9765E2CD2C3947200013D315 /* VideoPlayerManager.swift */; };
+		9765E2D02C3A98A20013D315 /* VideoPlayerEventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9765E2CF2C3A98A20013D315 /* VideoPlayerEventEmitter.swift */; };
+		9765E2D22C3AA6C60013D315 /* VideoPlayerEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9765E2D12C3AA6C60013D315 /* VideoPlayerEventEmitter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,8 @@
 		9765E2C92C3911500013D315 /* VideoPlayerView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		9765E2CB2C39123D0013D315 /* VideoPlayerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerManager.m; sourceTree = "<group>"; };
 		9765E2CD2C3947200013D315 /* VideoPlayerManager.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayerManager.swift; sourceTree = "<group>"; tabWidth = 4; };
+		9765E2CF2C3A98A20013D315 /* VideoPlayerEventEmitter.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayerEventEmitter.swift; sourceTree = "<group>"; tabWidth = 4; };
+		9765E2D12C3AA6C60013D315 /* VideoPlayerEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerEventEmitter.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -154,9 +158,11 @@
 			isa = PBXGroup;
 			children = (
 				9765E2C82C3911500013D315 /* VideoPlayerExample-Bridging-Header.h */,
-				9765E2C92C3911500013D315 /* VideoPlayerView.swift */,
 				9765E2CB2C39123D0013D315 /* VideoPlayerManager.m */,
 				9765E2CD2C3947200013D315 /* VideoPlayerManager.swift */,
+				9765E2C92C3911500013D315 /* VideoPlayerView.swift */,
+				9765E2CF2C3A98A20013D315 /* VideoPlayerEventEmitter.swift */,
+				9765E2D12C3AA6C60013D315 /* VideoPlayerEventEmitter.m */,
 			);
 			path = VideoPlayer;
 			sourceTree = "<group>";
@@ -417,8 +423,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9765E2D02C3A98A20013D315 /* VideoPlayerEventEmitter.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				9765E2D22C3AA6C60013D315 /* VideoPlayerEventEmitter.m in Sources */,
 				9765E2CE2C3947200013D315 /* VideoPlayerManager.swift in Sources */,
 				9765E2CC2C39123D0013D315 /* VideoPlayerManager.m in Sources */,
 				9765E2CA2C3911500013D315 /* VideoPlayerView.swift in Sources */,

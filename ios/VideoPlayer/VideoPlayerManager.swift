@@ -18,11 +18,25 @@ class VideoPlayerManager: RCTViewManager {
         return true
     }
   
-    @objc func play(_ node: NSNumber, urlString: String) {
+    @objc func load(_ node: NSNumber, urlString: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) -> Void {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let component = self.bridge.uiManager.view(forReactTag: node) as! VideoPlayerView
-            component.play(urlString)
+            component.loadVideo(urlString, onCompletion: { error in
+                if error == nil {
+                    resolver("Video loaded successfully")
+                } else {
+                    rejecter("PLAYBACK_ERROR", error?.localizedDescription, error)
+                }
+            })
+        }
+    }
+    
+    @objc func play(_ node: NSNumber) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let component = self.bridge.uiManager.view(forReactTag: node) as! VideoPlayerView
+            component.play()
         }
     }
     
