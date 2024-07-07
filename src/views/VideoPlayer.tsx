@@ -16,6 +16,7 @@ import {
   Alert,
   Text,
   ScrollView,
+  ScaledSize,
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Orientation from 'react-native-orientation-locker';
@@ -31,17 +32,18 @@ import {
 type Props = {};
 
 const VideoPlayerComponent: React.FC<Props> = () => {
-  const [orientation, setOrientation] = useState<string>('PORTRAIT');
+  const [dimensions, setDimensions] = useState<ScaledSize>(
+    Dimensions.get('window'),
+  );
   const videoRef = useRef<any>(null);
   const [url, setUrl] = useState<string>('');
   const [readyToPlay, setReadyToPlay] = useState<boolean>(false);
 
   useEffect(() => {
-    const initialOrientation = Orientation.getInitialOrientation();
-    setOrientation(initialOrientation);
+    setDimensions(Dimensions.get('window'));
 
     const orientationChangeListener = (newOrientation: string) => {
-      setOrientation(newOrientation);
+      setDimensions(Dimensions.get('window'));
     };
 
     Orientation.addOrientationListener(orientationChangeListener);
@@ -97,9 +99,6 @@ const VideoPlayerComponent: React.FC<Props> = () => {
     return invalid;
   };
 
-  const isLandscape = orientation !== 'PORTRAIT';
-  const dimensions = Dimensions.get('window');
-
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
@@ -147,9 +146,7 @@ const VideoPlayerComponent: React.FC<Props> = () => {
           ref={videoRef}
           style={[
             styles.videoPlayer,
-            isLandscape
-              ? styles.fullScreenVideo
-              : {width: dimensions.width, height: dimensions.width * (9 / 16)},
+            {width: dimensions.width, height: dimensions.width * (9 / 16)},
           ]}
         />
         <View style={styles.controls}>
