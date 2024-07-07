@@ -1,8 +1,12 @@
+//
+//  VideoPlayer.tsx
+//  VideoPlayerExample
+//
+//  Created by Terry Li on 06/07/2024.
+//
+
 import React, {useRef, useEffect, useState} from 'react';
 import {
-  NativeModules,
-  NativeEventEmitter,
-  requireNativeComponent,
   findNodeHandle,
   Button,
   TextInput,
@@ -18,10 +22,13 @@ import Orientation from 'react-native-orientation-locker';
 import model, {VideoItem} from '../models/VideoPlayerModel';
 import UrlValidator from '../utils/UrlValidator';
 
-type Props = {};
+import {
+  RNTVideoPlayerView,
+  RNTVideoPlayerControl,
+  RNTVideoPlayerEventEmitter,
+} from '@limengbeta/react-native-video-player';
 
-const {VideoPlayerManager, VideoPlayerEventEmitter} = NativeModules;
-const VideoPlayer = requireNativeComponent('VideoPlayer');
+type Props = {};
 
 const VideoPlayerComponent: React.FC<Props> = () => {
   const [orientation, setOrientation] = useState<string>('PORTRAIT');
@@ -45,8 +52,7 @@ const VideoPlayerComponent: React.FC<Props> = () => {
   }, []);
 
   useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(VideoPlayerEventEmitter);
-    const subscription = eventEmitter.addListener(
+    const subscription = RNTVideoPlayerEventEmitter.addListener(
       'onVideoPlayerError',
       error => {
         Alert.alert('Error', `${error.code}: ${error.message}`);
@@ -64,7 +70,7 @@ const VideoPlayerComponent: React.FC<Props> = () => {
     }
 
     const node = findNodeHandle(videoRef.current);
-    VideoPlayerManager.load(node, url)
+    RNTVideoPlayerControl.load(node, url)
       .then(() => {
         setReadyToPlay(true);
       })
@@ -75,12 +81,12 @@ const VideoPlayerComponent: React.FC<Props> = () => {
 
   const playVideo = () => {
     const node = findNodeHandle(videoRef.current);
-    VideoPlayerManager.play(node);
+    RNTVideoPlayerControl.play(node);
   };
 
   const pauseVideo = () => {
     const node = findNodeHandle(videoRef.current);
-    VideoPlayerManager.pause(node);
+    RNTVideoPlayerControl.pause(node);
   };
 
   const validateUrl = (value: string): Boolean => {
@@ -137,7 +143,7 @@ const VideoPlayerComponent: React.FC<Props> = () => {
           />
         </View>
 
-        <VideoPlayer
+        <RNTVideoPlayerView
           ref={videoRef}
           style={[
             styles.videoPlayer,

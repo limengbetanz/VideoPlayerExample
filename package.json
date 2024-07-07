@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@limengbeta/react-native-video-player": "^0.0.0",
     "@react-native-picker/picker": "^2.7.7",
     "react": "18.2.0",
     "react-native": "0.74.3",
