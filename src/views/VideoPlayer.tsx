@@ -16,10 +16,8 @@ import {
   Alert,
   Text,
   ScrollView,
-  ScaledSize,
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import Orientation from 'react-native-orientation-locker';
 import model, {VideoItem} from '../models/VideoPlayerModel';
 import UrlValidator from '../utils/UrlValidator';
 
@@ -32,26 +30,9 @@ import {
 type Props = {};
 
 const VideoPlayerComponent: React.FC<Props> = () => {
-  const [dimensions, setDimensions] = useState<ScaledSize>(
-    Dimensions.get('window'),
-  );
   const videoRef = useRef<any>(null);
   const [url, setUrl] = useState<string>('');
   const [readyToPlay, setReadyToPlay] = useState<boolean>(false);
-
-  useEffect(() => {
-    setDimensions(Dimensions.get('window'));
-
-    const orientationChangeListener = (newOrientation: string) => {
-      setDimensions(Dimensions.get('window'));
-    };
-
-    Orientation.addOrientationListener(orientationChangeListener);
-
-    return () => {
-      Orientation.removeOrientationListener(orientationChangeListener);
-    };
-  }, []);
 
   useEffect(() => {
     const subscription = RNTVideoPlayerEventEmitter.addListener(
@@ -124,7 +105,6 @@ const VideoPlayerComponent: React.FC<Props> = () => {
             value={url}
           />
         </View>
-
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Enter video URL:</Text>
           <TextInput
@@ -141,12 +121,20 @@ const VideoPlayerComponent: React.FC<Props> = () => {
             }}
           />
         </View>
-
         <RNTVideoPlayerView
           ref={videoRef}
           style={[
             styles.videoPlayer,
-            {width: dimensions.width, height: dimensions.width * (9 / 16)},
+            {
+              width:
+                Dimensions.get('window').width < Dimensions.get('window').height
+                  ? Dimensions.get('window').width
+                  : Dimensions.get('window').height,
+              height:
+                Dimensions.get('window').width < Dimensions.get('window').height
+                  ? Dimensions.get('window').width * (9 / 16)
+                  : Dimensions.get('window').height * (9 / 16),
+            },
           ]}
         />
         <View style={styles.controls}>
@@ -216,27 +204,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
 
-  fullScreenVideo: {
-    width: '100%',
-    height: '100%',
-  },
-
   controls: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     width: '100%',
     marginTop: 20,
-  },
-
-  fullScreenControls: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
   },
 });
 
